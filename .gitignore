@@ -1,0 +1,14 @@
+# Node.js files
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+
+# Editor files
+.vscode/
+.idea/
+
+# Miscellaneous
+Thumbs.db
+.DS_Store
