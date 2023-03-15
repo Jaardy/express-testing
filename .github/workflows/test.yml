@@ -1,0 +1,29 @@
+name: Test and Merge
+
+on:
+  push:
+    branches:
+      - testing
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm ci --dev
+
+      - name: Run tests
+        run: npm test
+
+      - name: Merge testing into dev
+        if: ${{ success() }}
+        uses: pullreminders/merge-action@v1.4.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_method: merge
+          base: dev
+          head: testing
