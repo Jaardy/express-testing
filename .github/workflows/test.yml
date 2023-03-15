@@ -23,7 +23,7 @@ jobs:
         if: ${{ success() }}
         uses: pullreminders/merge-action@v1.4.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.TOKEN }}
           merge_method: merge
           base: dev
           head: testing
