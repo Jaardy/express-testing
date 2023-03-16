@@ -1,4 +1,4 @@
-name: Test and PR
+name: Create PR on Success
 
 on:
   push:
@@ -8,22 +8,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+        with:
+          ref: refs/heads/testing
       - name: Install dependencies
         run: npm ci --dev
-
       - name: Run tests
         run: npm test
 
-      - name: Merge testing into dev
-        if: ${{ success() }}
-        uses: pullreminders/merge-action@v1.4.0
+  create_pull_request:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ needs.test.result == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
-          github_token: ${{ secrets.TOKEN }}
-          merge_method: merge
+          ref: refs/heads/testing
+      - name: Set up Git
+        uses: rlespinasse/git-commit-data-action@v1.x
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: testing
           base: dev
-          head: testing
+          title: Automatically generated pull request from testing to dev
+          committer: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+          author: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+          body: This pull request was automatically generated when tests passed on the testing branch.
